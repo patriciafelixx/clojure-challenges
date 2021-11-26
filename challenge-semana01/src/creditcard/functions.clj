@@ -1,7 +1,7 @@
 (ns creditcard.functions
-  (:require [creditcard.transactions :as c.transactions]))
+  (:require [creditcard.db :as c.db]))
 
-(group-by :category (c.transactions/all-records))
+(group-by :category (c.db/all-records))
 ; {
 ; Transporte [
 ;   {:customer-id 1, :date 2021-11-21T08:34:26, :value 100, :place Posto de Gasolina, :category Transporte}
@@ -40,7 +40,7 @@
    :num-records (count records)
    :total-amount (total-value records)})
 
-(->> (c.transactions/all-records)
+(->> (c.db/all-records)
      (group-by :category)
      (map by-item)
      println)
