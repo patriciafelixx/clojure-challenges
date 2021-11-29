@@ -1,5 +1,6 @@
 (ns creditcard.functions
-  (:require [creditcard.db :as c.db]))
+  (:require [creditcard.db :as c.db]
+            [java-time :as jt]))
 
 ; ------------------------------------------------------------------------------------------------------
 (println "=> TOTAL BY CATEGORIES")
@@ -11,8 +12,8 @@
 
 (defn by-item
   [[category records]]
-  {:category category
-   :num-records (count records)
+  {:category     category
+   :num-records  (count records)
    :total-amount (total-value records)})
 
 (->> (c.db/all-records)
@@ -25,11 +26,28 @@
 
 (defn by-place
   [[place records]]
-  {:place place
-   :num-records (count records)
+  {:place        place
+   :num-records  (count records)
    :total-amount (total-value records)})
 
 (->> (c.db/all-records)
      (group-by :place)
      (map by-place)
      println)
+
+; ------------------------------------------------------------------------------------------------------
+(println "=> CREDIT CARD INVOICE")
+
+(defn invoice
+  [card-number period]
+  (->> (c.db/all-records)
+       (filter #(= card-number (:creditcard-number %)))
+       (filter #(= (jt/year period) (jt/year (jt/local-date-time (:date %)))))
+       (filter #(= (jt/month period) (jt/month (jt/local-date-time (:date %)))))
+       total-value
+       println
+       ))
+
+(invoice "1654658431352967" (jt/local-date-time 2021 10))
+
+; ------------------------------------------------------------------------------------------------------
