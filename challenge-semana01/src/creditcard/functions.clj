@@ -42,12 +42,11 @@
   [card-number period]
   (->> (c.db/all-records)
        (filter #(= card-number (:creditcard-number %)))
-       (filter #(= (jt/year period) (jt/year (jt/local-date-time (:date %)))))
-       (filter #(= (jt/month period) (jt/month (jt/local-date-time (:date %)))))
+       (filter #(= (jt/year (jt/local-date "dd/MM/yyyy" period)) (jt/year (jt/local-date-time (:date %)))))
+       (filter #(= (jt/month (jt/local-date "dd/MM/yyyy" period)) (jt/month (jt/local-date-time (:date %)))))
        total-value
-       println
-       ))
+       println))
 
-(invoice "1654658431352967" (jt/local-date-time 2021 10))
+(invoice "1654658431352967" "01/11/2021")
 
 ; ------------------------------------------------------------------------------------------------------
