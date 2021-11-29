@@ -1,7 +1,8 @@
 (ns creditcard.functions
   (:require [creditcard.db :as c.db]))
 
-(group-by :category (c.db/all-records))
+; ------------------------------------------------------------------------------------------------------
+(println "=> TOTAL BY CATEGORIES")
 
 (defn total-value [records]
   (->> records
@@ -17,4 +18,18 @@
 (->> (c.db/all-records)
      (group-by :category)
      (map by-item)
+     println)
+
+; ------------------------------------------------------------------------------------------------------
+(println "=> TOTAL BY PLACES")
+
+(defn by-place
+  [[place records]]
+  {:place place
+   :num-records (count records)
+   :total-amount (total-value records)})
+
+(->> (c.db/all-records)
+     (group-by :place)
+     (map by-place)
      println)
