@@ -50,3 +50,21 @@
 (invoice "1654658431352967" "01/11/2021")
 
 ; ------------------------------------------------------------------------------------------------------
+(defn filter-by-place
+  [place]
+  (println "=> RECORDS MADE IN" place)
+  (->> (c.db/all-records)
+       (filter #(= place (:place %)))
+       println))
+
+(filter-by-place "Padaria")
+
+; ------------------------------------------------------------------------------------------------------
+(defn filter-by-value
+  [value]
+  (println "=> RECORDS WORTH" value)
+  (->> (c.db/all-records)
+       (filter #(= value (:value %)))
+       println))
+
+(filter-by-value 100.00)
