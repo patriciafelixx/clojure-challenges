@@ -1,8 +1,13 @@
 (ns creditcard.logic
   (:require [creditcard.db :as c.db]
-            [java-time :as jt]))
+            [java-time :as jt]
+            [creditcard.model :as c.model]
+            [schema.core :as s]))
 
-(defn all-records []
+(s/set-fn-validation! true)
+
+(s/defn all-records :- [c.model/Record]
+  []
   "Returns all transaction records "
   (c.db/all-records))
 
@@ -12,21 +17,21 @@
 
 (defn by-item
   [[item records]]
-  {:category    item
+  {:item    item
    :total-value (total-value records)})
 
-(defn total-by-item
+(s/defn total-by-item
   "Returns all records grouped"
-  [list group]
+  [list :- [c.model/Record] group :- s/Keyword]
   (map by-item (group-by group list)))
 
-(defn filter-by-item
+(s/defn filter-by-item :- [c.model/Record]
   "Returns all records for a specific filter"
-  [key item]
+  [key :- s/Keyword item]
   (filter #(= item (key %)) (all-records)))
 
-(defn invoice
-  [card-number period]
+(s/defn invoice :- s/Num
+  [card-number :- s/Str period :- s/Str]
   "Returns invoice value filtered by month"
   (->> (filter-by-item :creditcard-number card-number)
        (filter #(= (jt/year (jt/local-date "dd/MM/yyyy" period)) (jt/year (jt/local-date-time (:date %)))))
