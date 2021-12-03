@@ -1,10 +1,20 @@
 (ns creditcard.model
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [java-time :as jt]))
+
+(defn valid-card? [x] (= (count x) 16))
+(def CreditCardNumber (s/constrained s/Str valid-card? 'credit-card-invalid))
+
+(defn valid-date? [x] (jt/local-date-time? (jt/local-date-time x)))
+(def Date (s/constrained s/Str valid-date?))
+
+(defn valid-value? [x] (>= x 0))
+(def Value (s/constrained s/Num valid-value?))
 
 (s/def Record
   "A schema for a record"
-  {:creditcard-number s/Str
-     :date s/Str
-     :value s/Num
-     :place s/Str
-     :category s/Str})
+  {:creditcard-number CreditCardNumber
+   :date              Date
+   :value             Value
+   :place             s/Str
+   :category          s/Str})

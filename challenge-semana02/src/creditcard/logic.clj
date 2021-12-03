@@ -27,13 +27,13 @@
 
 (s/defn filter-by-item :- [c.model/Record]
   "Returns all records for a specific filter"
-  [key :- s/Keyword item]
-  (filter #(= item (key %)) (all-records)))
+  [list :- [c.model/Record] key :- s/Keyword item]
+  (filter #(= item (key %)) list))
 
-(s/defn invoice :- s/Num
-  [card-number :- s/Str period :- s/Str]
+(s/defn invoice :- c.model/Value
+  [card-number :- c.model/CreditCardNumber period :- s/Str]
   "Returns invoice value filtered by month"
-  (->> (filter-by-item :creditcard-number card-number)
+  (->> (filter-by-item (all-records) :creditcard-number card-number)
        (filter #(= (jt/year (jt/local-date "dd/MM/yyyy" period)) (jt/year (jt/local-date-time (:date %)))))
        (filter #(= (jt/month (jt/local-date "dd/MM/yyyy" period)) (jt/month (jt/local-date-time (:date %)))))
        total-value))

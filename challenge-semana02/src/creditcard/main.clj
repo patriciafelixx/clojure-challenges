@@ -10,10 +10,10 @@
 (println "--------------------------------------------------------")
 
 (println "FILTER BY PLACE: Padaria"
-         (c.logic/filter-by-item :place "Padaria"))
+         (c.logic/filter-by-item (c.logic/all-records) :place "Padaria"))
 
 (println "FILTER BY VALUE: 100.00"
-         (c.logic/filter-by-item :value 100.00))
+         (c.logic/filter-by-item (c.logic/all-records) :value 100.00))
 
 (println "--------------------------------------------------------")
 
