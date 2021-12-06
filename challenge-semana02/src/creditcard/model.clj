@@ -8,7 +8,7 @@
 (defn valid-date? [x] (jt/local-date-time? (jt/local-date-time x)))
 (def Date (s/constrained s/Str valid-date?))
 
-(defn valid-value? [x] (>= x 0))
+(defn valid-value? [x] (not (neg? x)))
 (def Value (s/constrained s/Num valid-value?))
 
 (s/def Record

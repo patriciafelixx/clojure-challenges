@@ -13,7 +13,7 @@
                             :email "fulanox@email.com"}})
 
 (defn get-creditcard []
-  [creditcard])
+  creditcard)
 
 ;------------------------------------------------------------------------------------
 ; TRANSACTIONS

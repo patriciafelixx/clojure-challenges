@@ -11,14 +11,23 @@
   "Returns all transaction records "
   (c.db/all-records))
 
+(s/defn get-creditcard
+  []
+  "Returns creditcard"
+  (c.db/get-creditcard))
+
 (defn total-value
-  [records]
-  (reduce + (map :value records)))
+  [limit-creditcard records]
+  (let [total (reduce + (map :value records))]
+  (if (<= total limit-creditcard)
+    total
+    (throw (ex-info "Limite do cartão ultrapassado!"
+                    {:limit limit-creditcard :total total})))))
 
 (defn by-item
   [[item records]]
   {:item    item
-   :total-value (total-value records)})
+   :total-value (total-value (:limit (get-creditcard)) records)})
 
 (s/defn total-by-item
   "Returns all records grouped"
@@ -36,4 +45,5 @@
   (->> (filter-by-item (all-records) :creditcard-number card-number)
        (filter #(= (jt/year (jt/local-date "dd/MM/yyyy" period)) (jt/year (jt/local-date-time (:date %)))))
        (filter #(= (jt/month (jt/local-date "dd/MM/yyyy" period)) (jt/month (jt/local-date-time (:date %)))))
-       total-value))
+       (total-value (:limit (get-creditcard)))))
+       ;(total-value 100.00)))
