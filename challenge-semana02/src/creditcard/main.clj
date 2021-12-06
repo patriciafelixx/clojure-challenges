@@ -22,3 +22,9 @@
 
 (println "CREDIT CARD INVOICE: November"
          (c.logic/invoice "1654658431352967" "01/11/2021"))
+
+(println "--------------------------------------------------------")
+
+(println "INSERT NEW RECORD"
+         (c.logic/new-record
+           (c.logic/all-records), "1654658431352967", "2021-12-06T11:30:00", 20000.00, "Plano de Saúde", "Saúde"))

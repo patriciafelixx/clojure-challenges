@@ -19,14 +19,14 @@
 (defn total-value
   [limit-creditcard records]
   (let [total (reduce + (map :value records))]
-  (if (<= total limit-creditcard)
-    total
-    (throw (ex-info "Limite do cartão ultrapassado!"
-                    {:limit limit-creditcard :total total})))))
+    (if (<= total limit-creditcard)
+      total
+      (throw (ex-info "Limite do cartão ultrapassado!"
+                      {:limit limit-creditcard :total total})))))
 
 (defn by-item
   [[item records]]
-  {:item    item
+  {:item        item
    :total-value (total-value (:limit (get-creditcard)) records)})
 
 (s/defn total-by-item
@@ -46,4 +46,17 @@
        (filter #(= (jt/year (jt/local-date "dd/MM/yyyy" period)) (jt/year (jt/local-date-time (:date %)))))
        (filter #(= (jt/month (jt/local-date "dd/MM/yyyy" period)) (jt/month (jt/local-date-time (:date %)))))
        (total-value (:limit (get-creditcard)))))
-       ;(total-value 100.00)))
+
+(s/defn new-record :- [c.model/Record]
+  [list :- [c.model/Record],
+   card-number :- c.model/CreditCardNumber,
+   date :- c.model/Date,
+   value :- c.model/Value,
+   place :- s/Str,
+   category :- s/Str]
+  (let [new {:creditcard-number card-number, :date date, :value value, :place place, :category category}]
+    (try
+      (total-value (:limit (get-creditcard)) (conj list new))
+      (conj list new)
+      (catch clojure.lang.ExceptionInfo e
+        list))))
