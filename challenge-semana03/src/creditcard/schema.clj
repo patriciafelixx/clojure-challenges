@@ -1,22 +1,22 @@
 (ns creditcard.schema)
 
 (def schema [
-             ; COSTUMER
-             {:db/ident       :costumer/id
+             ; CUSTOMER
+             {:db/ident       :customer/id
               :db/valueType   :db.type/uuid
               :db/unique      :db.unique/identity
               :db/cardinality :db.cardinality/one}
 
-             {:db/ident       :costumer/name
+             {:db/ident       :customer/name
               :db/valueType   :db.type/string
               :db/cardinality :db.cardinality/one}
 
-             {:db/ident       :costumer/cpf
+             {:db/ident       :customer/cpf
               :db/valueType   :db.type/string
               :db/unique      :db.unique/identity
               :db/cardinality :db.cardinality/one}
 
-             {:db/ident       :costumer/email
+             {:db/ident       :customer/email
               :db/valueType   :db.type/string
               :db/cardinality :db.cardinality/one}
 
@@ -72,9 +72,5 @@
               :db/cardinality :db.cardinality/one}
 
              {:db/ident       :transaction/card
-              :db/valueType   :db.type/ref
-              :db/cardinality :db.cardinality/one}
-
-             {:db/ident       :transaction/customer
               :db/valueType   :db.type/ref
               :db/cardinality :db.cardinality/one}])

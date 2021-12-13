@@ -6,14 +6,14 @@
 (defn dateformat [date]
   (.parse (java.text.SimpleDateFormat. "dd/MM/yyyy") date))
 
-(defn costumer
+(defn customer
   ([name cpf email]
-   (costumer (uuid) name cpf email))
+   (customer (uuid) name cpf email))
   ([uuid name cpf email]
-   {:costumer/id    uuid
-    :costumer/name  name
-    :costumer/cpf   cpf
-    :costumer/email email}))
+   {:customer/id    uuid
+    :customer/name  name
+    :customer/cpf   cpf
+    :customer/email email}))
 
 (defn creditcard
   ([number validate limit cvv]

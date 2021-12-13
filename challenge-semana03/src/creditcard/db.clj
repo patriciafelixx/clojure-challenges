@@ -16,14 +16,14 @@
   (d/delete-database db-uri))
 
 ; --------------------------------------------------------------------------------------------------------------------
-; COSTUMERS
+; customerS
 
-(defn add-costumer! [conn costumer]
-  (d/transact conn costumer))
+(defn add-customer! [conn customer]
+  (d/transact conn customer))
 
-(defn all-costumers [db]
+(defn all-customers [db]
   (d/q '[:find (pull ?e [*])
-         :where [?e :costumer/name]] db))
+         :where [?e :customer/name]] db))
 
 ; --------------------------------------------------------------------------------------------------------------------
 ; CREDIT CARDS
@@ -37,7 +37,7 @@
 
 (defn assign-card-to-customer! [conn creditcard customer]
   (d/transact conn [[:db/add [:creditcard/id (:creditcard/id creditcard)]
-                     :creditcard/customer [:costumer/id (:costumer/id customer)]]]))
+                     :creditcard/customer [:customer/id (:customer/id customer)]]]))
 
 ; --------------------------------------------------------------------------------------------------------------------
 ; TRANSACTIONS
@@ -62,3 +62,14 @@
          :where [?e :creditcard/number ?card-number]
          [?tr :transaction/card ?e]]
        db, card-number))
+
+(defn transactions-by-customer [db, customer-cpf]
+  (d/q '[:find (pull ?customer [:customer/name :customer/cpf]),
+         (pull ?card [:creditcard/number]),
+         (pull ?tr [*])
+         :in $ ?customer-cpf
+         :where [?customer :customer/cpf ?customer-cpf]
+         [?card :creditcard/customer ?customer]
+         [?tr :transaction/card ?card]
+         ]
+       db, customer-cpf))

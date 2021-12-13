@@ -10,14 +10,14 @@
 (db/create-schema! conn)
 
 ; --------------------------------------------------------------------------------------------------------------------
-; COSTUMERS
+; customerS
 
-(def customer1 (model/costumer "Luca", "12345678910", "luca@email.com"))
-(def customer2 (model/costumer "Iara", "23145678990", "iara@email.com"))
-(def customer3 (model/costumer "Theo", "45657215478", "theo@email.com"))
-(db/add-costumer! conn [customer1, customer2, customer3])
+(def customer1 (model/customer "Luca", "12345678910", "luca@email.com"))
+(def customer2 (model/customer "Iara", "23145678990", "iara@email.com"))
+(def customer3 (model/customer "Theo", "45657215478", "theo@email.com"))
+(db/add-customer! conn [customer1, customer2, customer3])
 
-(db/all-costumers (d/db conn))
+(db/all-customers (d/db conn))
 
 ; --------------------------------------------------------------------------------------------------------------------
 ; CREDIT CARDS
@@ -78,3 +78,7 @@
 (db/transactions-by-card (d/db conn) "1654658431352967")
 (db/transactions-by-card (d/db conn) "9876543210987654")
 (db/transactions-by-card (d/db conn) "1478523694563219")
+
+(db/transactions-by-customer (d/db conn) "12345678910")
+(db/transactions-by-customer (d/db conn) "23145678990")
+(db/transactions-by-customer (d/db conn) "45657215478")
