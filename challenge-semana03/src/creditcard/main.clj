@@ -54,23 +54,9 @@
 (def tr17 (model/transaction (model/uuid), #inst"2021-11-11T17:45:28", 45M, "Taxi", "Transporte"))
 
 (db/add-transaction! conn [tr1, tr2, tr3, tr4, tr5, tr6, tr7, tr8, tr9, tr10, tr11, tr12, tr13, tr14, tr15, tr16, tr17])
-(db/assign-transactions-to-card! conn tr1 card1)
-(db/assign-transactions-to-card! conn tr2 card1)
-(db/assign-transactions-to-card! conn tr3 card1)
-(db/assign-transactions-to-card! conn tr4 card2)
-(db/assign-transactions-to-card! conn tr5 card2)
-(db/assign-transactions-to-card! conn tr6 card1)
-(db/assign-transactions-to-card! conn tr7 card2)
-(db/assign-transactions-to-card! conn tr8 card2)
-(db/assign-transactions-to-card! conn tr9 card1)
-(db/assign-transactions-to-card! conn tr10 card1)
-(db/assign-transactions-to-card! conn tr11 card2)
-(db/assign-transactions-to-card! conn tr12 card2)
-(db/assign-transactions-to-card! conn tr13 card2)
-(db/assign-transactions-to-card! conn tr14 card2)
-(db/assign-transactions-to-card! conn tr15 card1)
-(db/assign-transactions-to-card! conn tr16 card1)
-(db/assign-transactions-to-card! conn tr17 card2)
+
+(db/assign-transactions-to-card! conn [tr1, tr2, tr3, tr6, tr9, tr10, tr15, tr16] card1)
+(db/assign-transactions-to-card! conn [tr4, tr5, tr7, tr8, tr11, tr12, tr13, tr14, tr17] card2)
 (db/all-transactions (d/db conn))
 
 ; --------------------------------------------------------------------------------------------------------------------
@@ -79,6 +65,6 @@
 (db/transactions-by-card (d/db conn) "9876543210987654")
 (db/transactions-by-card (d/db conn) "1478523694563219")
 
-(db/transactions-by-customer (d/db conn) "12345678910")
-(db/transactions-by-customer (d/db conn) "23145678990")
-(db/transactions-by-customer (d/db conn) "45657215478")
+(db/transactions-by-customer-cpf (d/db conn) "12345678910")
+(db/transactions-by-customer-cpf (d/db conn) "23145678990")
+(db/transactions-by-customer-cpf (d/db conn) "45657215478")

@@ -49,9 +49,21 @@
   (d/q '[:find (pull ?e [*])
          :where [?e :transaction/id]] db))
 
-(defn assign-transactions-to-card! [conn transaction creditcard]
-  (d/transact conn [[:db/add [:transaction/id (:transaction/id transaction)]
-                     :transaction/card [:creditcard/id (:creditcard/id creditcard)]]]))
+;(defn assign-transactions-to-card! [conn transaction creditcard]
+;  (d/transact conn [[:db/add [:transaction/id (:transaction/id transaction)]
+;                     :transaction/card [:creditcard/id (:creditcard/id creditcard)]]]))
+
+(defn db-adds-transactions-card [transactions card]
+  (reduce (fn [db-adds tr] (conj db-adds [:db/add
+                                          [:transaction/id (:transaction/id tr)]
+                                          :transaction/card
+                                          [:creditcard/id (:creditcard/id card)]]))
+          []
+          transactions))
+
+(defn assign-transactions-to-card! [conn transactions card]
+  (let [to-transact (db-adds-transactions-card transactions card)]
+    (d/transact conn to-transact)))
 
 ; --------------------------------------------------------------------------------------------------------------------
 ; REPORTS
@@ -63,13 +75,11 @@
          [?tr :transaction/card ?e]]
        db, card-number))
 
-(defn transactions-by-customer [db, customer-cpf]
+(defn transactions-by-customer-cpf [db, customer-cpf]
   (d/q '[:find (pull ?customer [:customer/name :customer/cpf]),
-         (pull ?card [:creditcard/number]),
          (pull ?tr [*])
          :in $ ?customer-cpf
          :where [?customer :customer/cpf ?customer-cpf]
          [?card :creditcard/customer ?customer]
-         [?tr :transaction/card ?card]
-         ]
+         [?tr :transaction/card ?card]]
        db, customer-cpf))
