@@ -1,33 +1,64 @@
 (ns creditcard.db
-  (:require [datomic.api :as d]))
+  (:use clojure.pprint)
+  (:require [datomic.api :as d]
+            [creditcard.schema :as s]))
 
-(defn get-creditcard []
-  {:number   "1654658431352967"
-   :validate "07/10/2029"
-   :limit    5000.00
-   :cvv      321
-   :customer {:id    1
-              :name  "Fulano X"
-              :cpf   "123.456.789-10"
-              :email "fulanox@email.com"}})
+(def db-uri "datomic:dev://localhost:4334/creditcard")
 
-(defn all-records []
-  [{:creditcard-number "1654658431352967", :date "2021-10-21T08:34:26", :value 100.00, :place "Posto de Gasolina", :category "Transporte"},
-   {:creditcard-number "1654658431352967", :date "2021-10-24T09:35:00", :value 80.00, :place "Pizzaria", :category "Alimentação"},
-   {:creditcard-number "1654658431352967", :date "2021-10-25T10:37:15", :value 150.00, :place "Dentista", :category "Saúde"},
-   {:creditcard-number "1654658431352967", :date "2021-10-28T18:20:20", :value 90.00, :place "Cinema", :category "Lazer"},
-   {:creditcard-number "1654658431352967", :date "2021-10-28T21:55:05", :value 30.00, :place "Taxi", :category "Transporte"},
-   {:creditcard-number "1654658431352967", :date "2021-10-30T16:07:05", :value 20.00, :place "Padaria", :category "Alimentação"},
-   {:creditcard-number "1654658431352967", :date "2021-11-01T09:30:11", :value 700.00, :place "Supermercado", :category "Alimentação"},
-   {:creditcard-number "1654658431352967", :date "2021-11-02T12:12:12", :value 140.00, :place "Parque", :category "Lazer"},
-   {:creditcard-number "1654658431352967", :date "2021-11-05T18:22:24", :value 60.00, :place "Papelaria", :category "Estudos"},
-   {:creditcard-number "1654658431352967", :date "2021-11-05T18:37:25", :value 350.00, :place "Curso", :category "Estudos"},
-   {:creditcard-number "1654658431352967", :date "2021-11-07T08:40:12", :value 120.00, :place "Posto de Gasolina", :category "Transporte"},
-   {:creditcard-number "1654658431352967", :date "2021-11-07T09:07:01", :value 35.00, :place "Padaria", :category "Alimentação"},
-   {:creditcard-number "1654658431352967", :date "2021-11-10T11:10:15", :value 65.00, :place "Taxi", :category "Transporte"},
-   {:creditcard-number "1654658431352967", :date "2021-11-10T17:30:45", :value 200.00, :place "Supermercado", :category "Alimentação"},
-   {:creditcard-number "1654658431352967", :date "2021-11-11T17:45:28", :value 45.00, :place "Taxi", :category "Transporte"}])
+(defn connection []
+  (d/create-database db-uri)
+  (d/connect db-uri))
 
+(defn create-schema! [connection]
+  (d/transact connection s/schema))
 
-(def db-url "datomic:dev://localhost:4334/creditcard")
-(d/create-database db-url)
+(defn delete-db! []
+  (d/delete-database db-uri))
+
+; --------------------------------------------------------------------------------------------------------------------
+; COSTUMERS
+
+(defn add-costumer! [conn costumer]
+  (d/transact conn costumer))
+
+(defn all-costumers [db]
+  (d/q '[:find (pull ?e [*])
+         :where [?e :costumer/name]] db))
+
+; --------------------------------------------------------------------------------------------------------------------
+; CREDIT CARDS
+
+(defn add-creditcard! [conn creditcard]
+  (d/transact conn creditcard))
+
+(defn all-creditcards [db]
+  (d/q '[:find (pull ?e [*])
+         :where [?e :creditcard/number]] db))
+
+(defn assign-card-to-customer! [conn creditcard customer]
+  (d/transact conn [[:db/add [:creditcard/id (:creditcard/id creditcard)]
+                     :creditcard/customer [:costumer/id (:costumer/id customer)]]]))
+
+; --------------------------------------------------------------------------------------------------------------------
+; TRANSACTIONS
+
+(defn add-transaction! [conn transaction]
+  (d/transact conn transaction))
+
+(defn all-transactions [db]
+  (d/q '[:find (pull ?e [*])
+         :where [?e :transaction/id]] db))
+
+(defn assign-transactions-to-card! [conn transaction creditcard]
+  (d/transact conn [[:db/add [:transaction/id (:transaction/id transaction)]
+                     :transaction/card [:creditcard/id (:creditcard/id creditcard)]]]))
+
+; --------------------------------------------------------------------------------------------------------------------
+; REPORTS
+
+(defn transactions-by-card [db, card-number]
+  (d/q '[:find (pull ?tr [*])
+         :in $ ?card-number
+         :where [?e :creditcard/number ?card-number]
+         [?tr :transaction/card ?e]]
+       db, card-number))
